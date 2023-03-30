@@ -3,7 +3,7 @@ import { QueryEditorProps } from '@grafana/data';
 import { OpenSearchDatasource } from '../../datasource';
 import { OpenSearchOptions, OpenSearchQuery, QueryType } from '../../types';
 import { OpenSearchProvider } from './OpenSearchQueryContext';
-import { InlineField, InlineFieldRow, Input, QueryField } from '@grafana/ui';
+import { Button, InlineField, InlineFieldRow, Input, QueryField } from '@grafana/ui';
 import { changeAliasPattern, changeQuery } from './state';
 import { QueryTypeEditor } from './QueryTypeEditor';
 import { MetricAggregationsEditor } from './MetricAggregationsEditor';
@@ -12,12 +12,13 @@ import { useDispatch } from '../../hooks/useStatelessReducer';
 import { useNextId } from '../../hooks/useNextId';
 import { css } from '@emotion/css';
 import { PPLFormatEditor } from './PPLFormatEditor';
+import { createDefaultTraceQuery } from './Traces';
 
 export type OpenSearchQueryEditorProps = QueryEditorProps<OpenSearchDatasource, OpenSearchQuery, OpenSearchOptions>;
 
 export const QueryEditor = ({ query, onChange, datasource }: OpenSearchQueryEditorProps) => (
   <OpenSearchProvider datasource={datasource} onChange={onChange} query={query}>
-    <QueryEditorForm value={query} />
+    <QueryEditorForm value={query} onChange={onChange} />
   </OpenSearchProvider>
 );
 
@@ -29,11 +30,13 @@ const styles = {
 };
 interface Props {
   value: OpenSearchQuery;
+  onChange: (value: OpenSearchQuery) => void;
 }
 
-export const QueryEditorForm = ({ value }: Props) => {
+export const QueryEditorForm = ({ value, onChange }: Props) => {
   const dispatch = useDispatch();
   const nextId = useNextId();
+  console.log('the query obj', value);
 
   return (
     <>
@@ -67,6 +70,7 @@ export const QueryEditorForm = ({ value }: Props) => {
         <PPLFormatEditor />
       ) : (
         <>
+          <Button onClick={() => onChange(createDefaultTraceQuery(value))}>Traces</Button>
           <MetricAggregationsEditor nextId={nextId} />
           <BucketAggregationsEditor nextId={nextId} />
         </>
