@@ -33,6 +33,7 @@ import { gte, lt, satisfies } from 'semver';
 import { OpenSearchAnnotationsQueryEditor } from './components/QueryEditor/AnnotationQueryEditor';
 import { trackQuery } from 'tracking';
 import { sha256 } from 'utils';
+import { createTracesDataFrame } from './Traces';
 
 // Those are metadata fields as defined in https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-fields.html#_identity_metadata_fields.
 // custom fields can start with underscores, therefore is not safe to exclude anything that starts with one.
@@ -504,6 +505,7 @@ export class OpenSearchDatasource extends DataSourceApi<OpenSearchQuery, OpenSea
     for (const target of targets) {
       payload += this.createLuceneQuery(target, options);
     }
+    console.log('payload we sending over', payload);
 
     // We replace the range here for actual values. We need to replace it together with enclosing "" so that we replace
     // it as an integer not as string with digits. This is because elastic will convert the string only if the time
@@ -514,7 +516,8 @@ export class OpenSearchDatasource extends DataSourceApi<OpenSearchQuery, OpenSea
     payload = getTemplateSrv().replace(payload, options.scopedVars);
 
     return from(this.post(this.getMultiSearchUrl(), payload)).pipe(
-      map((res: any) => {
+      map((res: any, idx) => {
+        console.log('res', res.responses, 'only one response even if multiple queries', idx);
         const er = new OpenSearchResponse(targets, res);
 
         if (targets.some(target => target.isLogsQuery)) {
@@ -523,6 +526,11 @@ export class OpenSearchDatasource extends DataSourceApi<OpenSearchQuery, OpenSea
             enhanceDataFrame(dataFrame, this.dataLinks);
           }
           return response;
+        }
+
+        // this doesn't seem quite right, but I'm not sure we currently support multiple queries
+        if (targets.every(target => target.luceneQueryMode === 'traces')) {
+          return createTracesDataFrame(targets, res.responses);
         }
 
         return er.getTimeSeries();
@@ -588,7 +596,9 @@ export class OpenSearchDatasource extends DataSourceApi<OpenSearchQuery, OpenSea
     }
 
     let queryObj;
-    if (target.isLogsQuery || hasMetricOfType(target, 'logs')) {
+    if (target.luceneQueryMode === 'traces') {
+      queryObj = target.luceneQueryObj;
+    } else if (target.isLogsQuery || hasMetricOfType(target, 'logs')) {
       target.bucketAggs = [defaultBucketAgg()];
       target.metrics = [];
       // Setting this for metrics queries that are typed as logs

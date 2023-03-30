@@ -12,7 +12,7 @@ import { useDispatch } from '../../hooks/useStatelessReducer';
 import { useNextId } from '../../hooks/useNextId';
 import { css } from '@emotion/css';
 import { PPLFormatEditor } from './PPLFormatEditor';
-import { createDefaultTraceQuery } from './Traces';
+import { createDefaultTraceQuery } from '../../Traces';
 
 export type OpenSearchQueryEditorProps = QueryEditorProps<OpenSearchDatasource, OpenSearchQuery, OpenSearchOptions>;
 

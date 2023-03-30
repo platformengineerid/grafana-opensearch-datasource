@@ -78,6 +78,8 @@ export interface OpenSearchQuery extends DataQuery {
   timeField?: string;
   queryType?: QueryType;
   format?: PPLFormatType;
+  luceneQueryMode?: 'traces';
+  luceneQueryObj?: any; //todo
 }
 
 export type DataLinkConfig = {
