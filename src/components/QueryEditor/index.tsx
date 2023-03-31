@@ -12,7 +12,7 @@ import { useDispatch } from '../../hooks/useStatelessReducer';
 import { useNextId } from '../../hooks/useNextId';
 import { css } from '@emotion/css';
 import { PPLFormatEditor } from './PPLFormatEditor';
-import { createDefaultTraceQuery } from '../../Traces';
+import { createDefaultTraceQuery, createOneTrace } from '../../Traces';
 
 export type OpenSearchQueryEditorProps = QueryEditorProps<OpenSearchDatasource, OpenSearchQuery, OpenSearchOptions>;
 
@@ -71,6 +71,7 @@ export const QueryEditorForm = ({ value, onChange }: Props) => {
       ) : (
         <>
           <Button onClick={() => onChange(createDefaultTraceQuery(value))}>Traces</Button>
+          <Button onClick={() => onChange(createOneTrace(value))}>One random trace</Button>
           <MetricAggregationsEditor nextId={nextId} />
           <BucketAggregationsEditor nextId={nextId} />
         </>

@@ -5,7 +5,7 @@ export const createDefaultTraceQuery = (query: OpenSearchQuery): OpenSearchQuery
   ...query,
   luceneQueryMode: 'traces',
   luceneQueryObj: {
-    size: 0,
+    size: 10,
     query: {
       bool: {
         must: [{ range: { startTime: { gte: '$timeFrom', lte: '$timeTo' } } }],
@@ -56,6 +56,29 @@ export const createDefaultTraceQuery = (query: OpenSearchQuery): OpenSearchQuery
   },
 });
 
+/* 
+{"size":1000,"query":{"bool":{"must":[{"term":{"traceId":"00000000000000001c10de244eb9421a"}}],"filter":[],"should":[],"must_not":[]}},"index":"otel-v1-apm-span-*"}
+*/
+// temporary function to request one particular trace while we work on visualizing traces
+export const createOneTrace = (query: OpenSearchQuery): OpenSearchQuery => ({
+  ...query,
+  luceneQueryMode: 'traces',
+  luceneQueryObj: {
+    size: 1000,
+    query: {
+      bool: {
+        must: [
+          { range: { startTime: { gte: '$timeFrom', lte: '$timeTo' } } },
+          { term: { traceId: '00000000000000000038b5dfd2017015' } }, // Manually Update me! (for now)
+        ],
+        filter: [],
+        should: [],
+        must_not: [],
+      },
+    },
+  },
+});
+
 export const createTracesDataFrame = (targets, response): DataQueryResponse => {
   const traceIds = [];
   const traceGroups = [];
@@ -83,4 +106,8 @@ export const createTracesDataFrame = (targets, response): DataQueryResponse => {
   };
   const dataFrames = new MutableDataFrame(traceFields);
   return { data: [dataFrames], key: targets[0].refId };
+};
+
+export const createTraceDataFrame = () => {
+  // something here?
 };

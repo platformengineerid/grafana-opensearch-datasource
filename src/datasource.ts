@@ -530,6 +530,7 @@ export class OpenSearchDatasource extends DataSourceApi<OpenSearchQuery, OpenSea
 
         // this doesn't seem quite right, but I'm not sure we currently support multiple queries
         if (targets.every(target => target.luceneQueryMode === 'traces')) {
+          // maybe we will call createTraceDataFrame here??
           return createTracesDataFrame(targets, res.responses);
         }
 
