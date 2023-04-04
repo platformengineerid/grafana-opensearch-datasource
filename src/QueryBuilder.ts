@@ -231,7 +231,7 @@ export class QueryBuilder {
     if (target.bucketAggs.length === 0) {
       metric = target.metrics[0];
 
-      if (!metric || !(metric.type === 'raw_document' || metric.type === 'raw_data')) {
+      if (!metric || !(metric.type === 'raw_document' || metric.type === 'raw_data' || metric.type === 'trace')) {
         throw { message: 'Invalid query' };
       }
     }

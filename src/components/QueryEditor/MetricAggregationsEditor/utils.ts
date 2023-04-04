@@ -213,6 +213,18 @@ export const metricAggregationConfig: MetricsConfiguration = {
     hasMeta: false,
     defaults: {},
   },
+  trace: {
+    label: 'Trace',
+    requiresField: false,
+    isSingleMetric: true,
+    isPipelineAgg: false,
+    supportsMissing: false,
+    supportsMultipleBucketPaths: false,
+    hasSettings: false,
+    supportsInlineScript: false,
+    hasMeta: false,
+    defaults: {},
+  },
 };
 
 interface PipelineOption {

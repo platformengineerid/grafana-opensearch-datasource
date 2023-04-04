@@ -33,7 +33,7 @@ import { gte, lt, satisfies } from 'semver';
 import { OpenSearchAnnotationsQueryEditor } from './components/QueryEditor/AnnotationQueryEditor';
 import { trackQuery } from 'tracking';
 import { sha256 } from 'utils';
-import { createTracesDataFrame } from './Traces';
+import { createTraceDataFrame, createTracesDataFrame } from './Traces';
 
 // Those are metadata fields as defined in https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-fields.html#_identity_metadata_fields.
 // custom fields can start with underscores, therefore is not safe to exclude anything that starts with one.
@@ -527,6 +527,10 @@ export class OpenSearchDatasource extends DataSourceApi<OpenSearchQuery, OpenSea
           }
           return response;
         }
+        // not sure what the condition here will be, depends on what we decide the UI will be
+        if (targets.every(target => target.isSingleTrace)) {
+          return createTraceDataFrame(targets, res.responses);
+        }
 
         // this doesn't seem quite right, but I'm not sure we currently support multiple queries
         if (targets.every(target => target.luceneQueryMode === 'traces')) {
@@ -595,7 +599,6 @@ export class OpenSearchDatasource extends DataSourceApi<OpenSearchQuery, OpenSea
     if (!queryString || queryString === '') {
       queryString = '*';
     }
-
     let queryObj;
     if (target.luceneQueryMode === 'traces') {
       queryObj = target.luceneQueryObj;

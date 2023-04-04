@@ -80,6 +80,7 @@ export interface OpenSearchQuery extends DataQuery {
   format?: PPLFormatType;
   luceneQueryMode?: 'traces';
   luceneQueryObj?: any; //todo
+  isSingleTrace?: boolean; // yeah not this
 }
 
 export type DataLinkConfig = {
@@ -96,4 +97,31 @@ export enum QueryType {
 export enum Flavor {
   Elasticsearch = 'elasticsearch',
   OpenSearch = 'opensearch',
+}
+export interface OpenSearchSpanEvent {
+  name: string;
+  time: string; //ISO String
+  attributes: {
+    level: string;
+    error?: string;
+  };
+}
+export interface OpenSearchSpan {
+  traceId: string;
+  serviceName: string;
+  parentSpanId: string;
+  spanId: string;
+  name: string;
+  startTime: string;
+  durationInNanos: number;
+  events: OpenSearchSpanEvent[];
+  // will be mapped to serviceTags - "Resource" in TraceView
+  resource?: {
+    attributes: Record<string, any>;
+  };
+  // will be mapped to tags - "Attributes" in TraceView
+  span?: {
+    attributes: Record<string, any>;
+  };
+  [key: string]: any;
 }
